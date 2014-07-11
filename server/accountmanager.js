@@ -1,16 +1,21 @@
 //accountmanager.js
 //accepts username/password combos and updates/reads database accordingly
 
+/*TODO: add salt-and-hash (for basic safety?), add return object to pass to client on login (pass/fail status code?), 
+confirmation of current pass on password change,bobject to pass to uploadmanager on login to get those files sent to the client, 
+add time-created, email address for password recovery?, some client-side code to check if details are kept in a cookie, 
+may need some intermediate validator for the form, ...*/
+
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
 
 // Connect to the db
-function getConnection(callback) {
+function getConnection(callback) { //temporary localhost/port/database marker
 	MongoClient.connect("mongodb://localhost:27017/database", function(err, db) {
   if(err) {
     return callback(err);
   }
-  //create new collection if it's not there
+  //create new collection (only if it's not there)
   var collection = db.collection('users');
   //index  by name, for search speed
   collection.ensureIndex({name: true}, function (err) {
@@ -23,6 +28,7 @@ function getConnection(callback) {
 }
 
 //to change a password: finds an account with that username, sets password, returns document (user) with changed password
+//TODO: need to do this only when 'logged in'
 function updateAccount(collection, name, password, callback) {
 	collection.findAndModify({name: name}, {}, {$set: {password: password}},
 		{upsert: false, new: true}, callback);
@@ -64,12 +70,12 @@ function printUser(user) {
 }
 
 //prints all users in the database (for list)
-function printUsers(users, callback) {
+/*function printUsers(users, callback) {
 	users.each(function(err, user) {
 		if (err) return callback(err);
 		printUser(user);
 	})
-}
+}*/
 
 //confirms whether or not that username/password combination was found
 function signinUser(user) {
@@ -103,6 +109,7 @@ function accountManage(operation, name, password, callback) {
 			callback();
 		}
 
+		//handle  account deletion requests
 		function processDeletion(err, user) {
 			if (err) return callback(err);
 			collection.db.close();
@@ -144,6 +151,7 @@ function accountManage(operation, name, password, callback) {
 var operation = process.argv[2];
 var name = process.argv[3];
 var password = process.argv[4];
+//some kind of 'logged in' token, to be passed back to the client on signin then returned in order to access deletion, etc?
 
 //run main to test:
 accountManage(operation, name, password, function(err) {
