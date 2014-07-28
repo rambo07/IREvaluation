@@ -1,12 +1,12 @@
 //uploadmanager.js
 //accepts files and metadata (uploader, file descriptor to be displayed, system/task name)
 
-/* TODO: add in 'file parsing' methods, calling some other code to get correct data from file to store in db (trec output -> JSON)? 
-change 'file' into qrels/results later, add sending query to TREC (all external methods)*/
+// TODO: change 'file' into qrels/results later, add sending query to TREC (all external methods), figure out the query: queries problem 
 
 // Retrieve
 var MongoClient = require('mongodb').MongoClient
-var fileupload = require('fileupload').createFileUpload('/uploadDir')
+var fs = require('fs')
+var byline = require('byline')
 
 // Connect to the db
 function getConnection(callback) { //localhostetc temporary
@@ -27,28 +27,62 @@ function getConnection(callback) { //localhostetc temporary
 })
 }
 
-//to add or change a document
-//TODO: change to manage actual uploaded items, check if that run name is already used for a run?
-function replaceRun(collection, name, file, task, runname, callback) { 
+//to add things to an uploaded document?
+//TODO: change to add extra 'comments' files/strings?
+function modifyRun(collection, name, file, task, runname, callback) { 
 	var date = new Date()
 	collection.findAndModify({name: name, task: task}, {}, 
 		{$set: {runname: runname, file: file, date: date}}, 
 		{upsert: true, new: true}, callback)
 }
 
-function addRun(collection, name, file, task, runname, callback) {
-	var date = new Date()
-	collection.find({name:name, task:task, runname:runname}).toArray(function(err, docs){
-		if (docs.length === 0) { //i.e. there are no documents with that name
-			collection.insert({name:name, task:task, runname: runname, file:file, date:date}, {w:1}, callback) //insert the file
+var buffer = []
+
+function newRun(collection, name, taskname, runname, file, callback) {
+
+	var date = new Date() //for my records: may be useful to show user
+
+	collection.find({name: name, task: taskname, run: runname}).toArray(function(err, docs) {
+		if (docs.length === 0) { //i.e. there is no run for that task with that name: go ahead
+
+			var readable = fs.createReadStream(file, {encoding: 'utf8'}) //create filestream
+			var stream = byline(readable) //make it readable by line
+			var documents = { //create document to be added to collection
+				//name: name,
+				date: date,
+				task: taskname,
+				run: runname,
+				results: [] //array to contain results from file
+			}
+			stream.on('data', function(line) {
+				var words = line.split("\t") //split by tabs: works for now, may not on final product
+				var measure = words[0].trim() //remove excess whitespace
+				var query = words[1]
+				var value = words[2]
+				//console.log('\{ '+measure+': '+value+', query: '+query+' \}'); //temp print for checks
+				var document = { //create object for each line
+					measure: measure,
+					query: query,
+					value: value
+				}
+
+				documents.results.push(document) //add object to 'results'
+			})
+			stream.on('error', function(err) { //an error occurs in filereading
+				return callback(new Error("An error occurred"))
+			})
+			stream.on('end', function() { //when everything has been read, add document to database and return.
+				collection.findAndModify({name: name}, {}, {$set: documents}, {upsert: true, new: true}, callback)
+			})
 		} else {
-			return callback(new Error("There is already a run for that task with that description, please choose another."))
+			return callback(new Error("There is already a run for that task with that description, please choose a different description."))
 		}
-	})	
+	})
 }
 
+//deletes all runs for a given task
 function deleteRuns(collection, name, task, callback) {
-	collection.findAndRemove({name: name, task: task}, {w:1}, callback)
+	collection.remove({name: name, task: task}, callback)
 }
 
 function deleteRun(collection, name, task, runname, callback) {
@@ -57,12 +91,12 @@ function deleteRun(collection, name, task, runname, callback) {
 
 //to fetch a specific upload
 function readRun(collection, name, task, runname, callback) {
-	collection.findOne({name: name, task: task, runname: runname}, callback)
+	collection.findOne({name: name, task: task, run: runname}, callback)
 }
  
-//or multiple specific uploads from the same task
+//or multiple specific uploads from the same task (for comparison)
 function readMany(collection, name, task, callback) {
-	collection.find({name: name}, callback) //TODO: EDIT
+	collection.find({name: name, task: task}, callback) //TODO: change to do what it says on the tin
 }
 
 //or fetch everything that user has uploaded (e.g. on startup)
@@ -74,18 +108,17 @@ function printDescription(upload) {
 	if (!upload) {
 		console.log("No such record.")
 	} else {
-		console.log(upload.name +", " + upload.task +", "+upload.runname+", "+upload.date)
+		console.log(upload.name +", " + upload.task +", "+upload.run+", "+upload.date)
 	}
 }
 
-//to "print" a single upload - for now just prints runname, 
-//will actually pass the correct json for the graph, or the names
-//for the table?
+//TODO: will actually pass the correct file for the graph
 function printRun(upload) { //TEMPORARY
 	if (!upload) {
 		console.log("Could not find specified record")
+	} else {
+		console.log(upload.results[1])
 	}
-	console.log(upload.runname + " from " + upload.task + " by " + upload.name)
 }
 
 //"main"
@@ -140,9 +173,8 @@ function uploadManage(operation, name, file, task, runname, callback) {
 		}
 
 		//operate based on input:
-		//May change 'file' to just be text output from trec_eval, have separate methods for handling qrels + results
 		if (operation === "upload") {
-			addRun(collection, name, file, task, runname, processUpload)
+			newRun(collection, name, file, task, runname, processUpload)
 		} else if (operation === "delete") {
 			deleteRun(collection, name, task, runname, processDeletion)
 		} else if (operation === "deleteall") {
@@ -159,15 +191,15 @@ function uploadManage(operation, name, file, task, runname, callback) {
 	})
 }
 
-//take inputs and assign to useful readable variables
-var operation = process.argv[2] //presumably 'upload' or 'delete'?
+//TEMPORARY: take inputs and assign to useful readable variables (will later be done by method calls, or passed request?)
+var operation = process.argv[2] 
 var name = process.argv[3] //the username of the person uploading
 var file = process.argv[4] //eventually will be qrels/results, to be stored as files in binary, run through TREC_EVAL, producing the results
 							//which are stored and sent to client?
 var task = process.argv[5] //the task name attached to this run
 var runname = process.argv[6] //the 'name' attached to the specific run
 
-//*will eventually be the file passed from the client but that part's not even started yet.
+//*will eventually be the file passed from the client
 
 //run main with inputs:
 uploadManage(operation, name, file, task, runname, function(err) {

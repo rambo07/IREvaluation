@@ -28,7 +28,6 @@ function getConnection(callback) { //temporary localhost/port/database marker
 }
 
 //to change a password: finds an account with that username, sets password, returns document (user) with changed password
-//TODO: need to do this only when 'logged in'
 function updateAccount(collection, name, password, callback) {
 	collection.findAndModify({name: name}, {}, {$set: {password: password}},
 		{upsert: false, new: true}, callback)
@@ -38,16 +37,15 @@ function updateAccount(collection, name, password, callback) {
 function createAccount(collection, name, password, callback) {
 	collection.find({name:name}).toArray(function(err, docs){
 		if (docs.length === 0) { //i.e. there are no documents with that name
-			collection.insert({name: name, password: password}, callback) //insert the user
+			collection.insert({name: name, password: password}, {new: true}, callback) //insert the user
 		} else {
-			console.log("There already exists a user with that name. Please choose another.")
-			callback(err,docs) //there must be a better way to do this (i.e. callback when there is no user in question), but I don't know it
+			return callback(new Error("There already exists a user with that name. Please choose another."))
 		}
 	})	
 }
 
 // finds if there exists that username/password combo
-//TODO: create variable for 'logged in' to be returned/used to access uploaded records
+//TODO: send request to upload manager for details of uploads?
 function loginAccount(collection, name, password, callback) {
 	collection.findOne({name:name, password:password}, callback)
 }
