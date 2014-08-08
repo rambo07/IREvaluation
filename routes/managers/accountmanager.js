@@ -13,21 +13,6 @@ var MongoClient = require('mongodb').MongoClient;
 var passport = require('passport')
 	, LocalStrategy = require('passport-local').Strategy;
 
-/*/define passport strategy:
-passport.use(new LocalStrategy(
-	function(username, password, done) {
-		collection.findOne({name: username}, function(err, user) {
-			if (err) { return done(err) }
-			else if (!user) {
-				return done(null, false, { message: 'Incorrect username.'});
-			}
-			else if (!user.validPassword(password)) {
-				return done(null, false, {message: 'Incorrect password'});
-			} //need to change to hash password later
-			else { return done(null, user); }
-		});
-	}));*/
-
 // Connect to the db
 function getConnection(callback) { //temporary localhost/port/database marker
 	MongoClient.connect("mongodb://localhost:27017/database", function(err, db) {

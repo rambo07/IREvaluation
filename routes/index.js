@@ -103,6 +103,7 @@ router.post('/logout', function(req, res) {
 })
 
 /* POST to uploadmanager (new upload) ?? deal with downloading file from user??*/ 
+//DOES NOT WORK AT PRESENT
 router.post('/upload', function(req, res) {
 	console.log("task: "+req.body.runname); //temp
 	pathname = __dirname + "/uploads/"+req.body.runname;
