@@ -1,14 +1,18 @@
 extends layout
 
 block content
+  script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")
   script(src='/javascripts/recordtable.js')
-  script(src='http://code.jquery.com/jquery-latest.min.js')
+  //populate table
+  script(type='text/javascript').
+    populateTable()
+
   h1= title
 
     // Wrapper
     #wrapper
 
-        // USER LIST
+        // RUN LIST
         h2 Previous Records
         #runList
             table
@@ -19,6 +23,7 @@ block content
                     th Display Results
                     th Comments
                 tbody
-        // /USER LIST
+        // /RUN LIST
 
     // /WRAPPER
+
