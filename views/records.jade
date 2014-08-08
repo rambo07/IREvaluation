@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  script(src='/javascripts/recordtable.js')
+  script(src='http://code.jquery.com/jquery-latest.min.js')
+  h1= title
+
+    // Wrapper
+    #wrapper
+
+        // USER LIST
+        h2 Previous Records
+        #runList
+            table
+                thead
+                    th Date
+                    th Task
+                    th Run
+                    th Display Results
+                    th Comments
+                tbody
+        // /USER LIST
+
+    // /WRAPPER

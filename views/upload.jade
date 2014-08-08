@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1= title
+  form#formAddUser(name="newupload",method="post",action="/upload")
+        input#inputFile(type="text", placeholder="filename", name="filename")
+        input#inputTaskname(type="text", placeholder="taskname", name="taskname")
+        input#inputRunname(type="text", placeholder="runname", name="runname")
+        input#inputComments(type="text", placeholder="comments", name="comments")
+        button#btnSubmit(type="submit") submit
