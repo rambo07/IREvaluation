@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    #footer
+          p Navigate:
+            a(href= '/upload') Upload New
+            | 
+            a(href= '/records') Previous Runs
+            | 
+            a(href= '/logout') Sign Out
+            | 
+            a(href= '/about') About
+
+
+    block content
+        

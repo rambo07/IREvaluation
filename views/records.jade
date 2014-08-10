@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")
+  script(src='/javascripts/recordtable.js')
+  //populate table
+  script(type='text/javascript').
+    populateTable()
+
+  h1= title
+
+    // Wrapper
+    #wrapper
+
+        // RUN LIST
+        h2 Previous Records
+        #runList
+            table
+                thead
+                    th Date
+                    th Task
+                    th Run
+                    th Display Results
+                    th Comments
+                tbody
+        // /RUN LIST
+
+    // /WRAPPER
+

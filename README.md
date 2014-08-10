@@ -9,3 +9,5 @@ Comparing the incremental growth of an individual system is complex. Comparing a
 
 Our tool presents a visual representation of different ranked list output for an IR task.
 Instead of the matrix of numbers(complex to read and interpret) we have the graphical representation of how the results varies across different runs, while changing/selecting different parameters such as evaluation  metric, averaged or query based representation.
+
+Run instructions: MongoDB must be running to provide the database, so first navigate to wherever you have mongo and run 'mongod --dbpath filepath\IREvaluation\data' (using whatever filepath the repository is installed in, obviously. It's not required to store the data here, of course, but it may be convenient.) Then, in the 'IREvaluation' folder, run 'npm start' and navigate to 'localhost:3000' in the browser of your choice. My previous data in the db may not transfer, and the upload function in the app does not work yet, so you may want to run mongo and 'db.uploads.insert' some files of your own - I have included a sample input in the 'sample.json' file.

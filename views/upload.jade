@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h1= title
+  p With the uploaded file, please provide the name of the task, a title for this run and any useful descriptive comments.
+  form#formUploadFile(name="upload",method="post",action="/upload",enctype="multipart/form-data")
+        input#inputFile(type="file", placeholder="file", name="file")
+        input#inputTaskname(type="text", placeholder="taskname", name="taskname")
+        input#inputRunname(type="text", placeholder="runname", name="runname")
+        input#inputComments(type="text", placeholder="comments", name="comments")
+        button#btnSubmit(type="submit") submit
