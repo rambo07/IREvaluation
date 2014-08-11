@@ -24,14 +24,15 @@ function populateTable() {
         // For each item in our JSON, add a table row and cells to the content string
         
         $.each(data, function(){
+            //todo: add some sort of sorting (here or when extracting from db)
             var newdate = new Date(this.date);
-
+            var tidy = newdate.toString().substring(0, 21);
             tableContent += '<tr>';
-            tableContent += '<td>' + newdate + '</td>';
+            tableContent += '<td>' + tidy + '</td>';
             tableContent += '<td>' + this.task + '</td>';
-            tableContent += '<td>' + this.run + '</td>';
+            tableContent += '<td>' + this.run +'</td>'; //" " + '<form><input type="button" method="post" action="/records" value="delete"></form> delete btn?
             tableContent += '<td><a href="/graph" class="linkshowresults" rel="' + this.run + '" title="Show Details">' + "X" + '</a></td>';
-            tableContent += '<td>' + "none" + '</td>'; //temp: will contain comments
+            tableContent += '<td>' + this.comments + '</td>'; //temp: will contain comments
             tableContent += '</tr>';
         });
 
