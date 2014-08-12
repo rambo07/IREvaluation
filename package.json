@@ -16,6 +16,7 @@
     "mongodb": "*",
     "mongoskin": "*",
     "express-session": "*",
-    "connect-busboy": "*"
+    "connect-busboy": "*",
+    "d3" : "3"
   }
 }

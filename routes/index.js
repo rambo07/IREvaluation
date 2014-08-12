@@ -5,6 +5,7 @@ var AM = require('./managers/accountmanager');
 var UM = require('./managers/uploadmanager');
 var fs = require('fs');
 var busboy = require('connect-busboy');
+var d3 = require('d3');
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -77,6 +78,17 @@ router.get('/details', function(req, res) {
 /* GET graph page*/
 router.get('/graph', function(req, res) {
 	res.render('graph', { title: 'View Results as Graph'});
+});
+
+/*TEMP GET functionjson pagerouter.get('/functionjson', function(req, res) {
+	res.render('functionjson', {title: 'Display Results'});
+});*/
+
+/* POST to graph page*/
+router.post('/records',function(req, res) {
+	req.session.currentrecord = req.body.run;
+	res.location("graph");
+	res.redirect("graph");
 });
 
 /* POST to accountmanager (new user)*/
