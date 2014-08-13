@@ -11,6 +11,15 @@ a {
   color: #00B7FF;
 }
 
+a:visited {
+	color: #006BF7;
+}
+
+a:hover {
+	color: #006B70;
+	text-decoration: none;
+}
+
 a#buttonlink {
 	color: #000000;
 	text-decoration: none;
@@ -52,3 +61,10 @@ h2 {
 	z-index: 9999;
 }
 
+#header {
+	width: 100%;
+	background-color: #DCDCED;
+	position: fixed;
+	top: 0;
+	z-index: 9999;
+}

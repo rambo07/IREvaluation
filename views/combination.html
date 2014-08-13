@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <style>
 .bar:hover {
-  fill: brown;
+  fill: #4CB4E0;
 }
 
 .axis path,
@@ -119,9 +119,9 @@ svg.selectAll(".bar")
    .attr("fill",function(d){
 	var barcolor;
 	if(d.measure.indexOf("sys1")!=-1){
-		 barcolor = "rgb(0,200,100)";}
+		 barcolor = "rgb(0,200,150)";}
 	else if(d.measure.indexOf("sys2")!=-1){
-		 barcolor = "rgb(0,0,100)";}
+		 barcolor = "rgb(0,50,150)";}
 	return barcolor; });
 
 svg.selectAll("text")
