@@ -9,10 +9,6 @@ may need some intermediate validator for the form, could add timestamps for crea
 // Retrieve mongo
 var MongoClient = require('mongodb').MongoClient;
 
-//use passport for authentication?
-var passport = require('passport')
-	, LocalStrategy = require('passport-local').Strategy;
-
 // Connect to the db
 function getConnection(callback) { //temporary localhost/port/database marker
 	MongoClient.connect("mongodb://localhost:27017/database", function(err, db) {

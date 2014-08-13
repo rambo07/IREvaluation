@@ -28,8 +28,8 @@ form {
 
 <form>
     <label><input type="radio" name="mode" value="groupAll" id="all" checked > All</label>
-    <label><input type="radio" name="mode" value="groupPrecision" id="precision"> Precision</label>
-    <label><input type="radio" name="mode" value="groupIPrecision" id="iprecision"> IPrecision</label>
+    <label><input type="radio" name="mode" value="groupPrecision" id="precision"> Precision</label> 
+<!--    <label><input type="radio" name="mode" value="groupIPrecision" id="iprecision"> IPrecision</label> -->
 </form>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
@@ -39,40 +39,60 @@ if(document.getElementById("all").checked)
 	check = ["map","gm_map","Rprec","bpref","recip_rank","P_5"];
 	draw(check);
 }
+function compare(a,b)
+{
+    console	
+    if (a.measure < b.measure)
+	return -1;
+    if (a.measure > b.measure)
+    	return 1;
+    return 0;
+}
 function draw(check){
-d3.json('records/runlist',function(json){
+d3.json("records/runlist",function(json){
+  
 	var test = d3.entries(json);
-  var testing;
+  /*var testing;
   $.each(json, function(){
       if (this.run == document.title) {
         console.log(this);
         testing = this;
       }
-  });
-	var measurename = [];
-	var measurevalue = [];
-  console.log(testing.run);
-  //console.log(test[5].value.run);
-	//console.log(test[2].value.results[0].measure);
-	for (var i in testing.results)
+  });*/
+  console.log(test[0].value.run); //will replace with "j" and "k" when run id get is working
+  console.log(test[2].value.run);
+	var measurecomb = [];
+	for (var i in test[0].value.results)
 	{
-	        if(check.indexOf(testing.results[i].measure)!=-1)
+	        if(check.indexOf(test[0].value.results[i].measure)!=-1)
 		{
-			measurename.push(testing.results[i].measure);
-			measurevalue.push(testing.results[i].value);
+			var item= {};
+			item.measure = test[0].value.results[i].measure+"_sys1";
+			item.value =  test[0].value.results[i].value;	
+			measurecomb.push(item);
 		}
 	}
-console.log(measurename);
-console.log(measurevalue);
+	for (var i in test[2].value.results)
+	{
+	        if(check.indexOf(test[2].value.results[i].measure)!=-1)
+		{
+			var item= {};
+			item.measure = test[2].value.results[i].measure+"_sys2";
+			item.value =  test[2].value.results[i].value;	
+			measurecomb.push(item);
+		}
+	}
 
+measurecomb.sort(compare);
+console.log(measurecomb);
 
-var w = 600;
+var w = 1000;
 var h = 350;
 var barPadding = 5;
 var padding = 20;
 
 var yscale = d3.scale.linear()
-                     .domain([0, d3.max(measurevalue, function(d) { return d; })])
+                     .domain([0, d3.max(measurecomb, function(d,i) {return d.value })])
 		     .range([h-padding,padding]);
 
 var xscale = d3.scale.ordinal()
@@ -86,30 +106,35 @@ var svg = d3.select("body")
             .attr("height", h);
 
 svg.selectAll(".bar")
-   .data(measurevalue)
+   .data(measurecomb)
    .enter()
    .append("rect")
    .attr("class","bar")
    .attr("x",function(d,i){
-	return ((padding*2)+i*((w-padding*2)/measurevalue.length));})
-       .attr("y", function(d){
-	console.log("test "+h+" "+d+" "+(h-yscale(d)));
-	return (yscale(d));})
-   .attr("width", w/measurevalue.length - barPadding*5)
-   .attr("height", function(d) {return h-yscale(d) -padding;})
-   .attr("fill",function(d){return "rgb(0,0,"+Math.round(h-yscale(d))+")";});
+	return ((padding*2)+i*((w-padding*2)/measurecomb.length));})
+       .attr("y", function(d,i){
+	return (yscale(d.value));})
+   .attr("width", w/measurecomb.length - barPadding*5)
+   .attr("height", function(d) {return h-yscale(d.value) -padding;})
+   .attr("fill",function(d){
+	var barcolor;
+	if(d.measure.indexOf("sys1")!=-1){
+		 barcolor = "rgb(0,200,100)";}
+	else if(d.measure.indexOf("sys2")!=-1){
+		 barcolor = "rgb(0,0,100)";}
+	return barcolor; });
 
 svg.selectAll("text")
-   .data(measurename)
+   .data(measurecomb)
    .enter()
    .append("text")
         
    .text(function(d) {
-        return d;
+        return d.measure;
    }) 
   .attr("text-anchor", "middle")
   .attr("x", function(d, i) {
-        return padding*2+ i*((w -padding*2)/ measurename.length) +((w -padding*2)/ measurename.length - barPadding*5)/2;
+        return padding*2+ i*((w -padding*2)/ measurecomb.length) +((w -padding*2)/ measurecomb.length - barPadding*5)/2;
    })
    .attr("y", function(d) {
         return h-barPadding ;
@@ -150,14 +175,14 @@ function change() {
 function transitionAll() {
 //Removing old SCG element
 d3.select("svg").remove();
-check = ["map","gm_map","Rprec","bpref","recip_rank","P_5"];
+check = ["map","gm_map","Rprec","bpref","P_5"];
 draw(check);
 }
 
 function transitionPrecision() {
 //Removing old SCG element
 d3.select("svg").remove();
-precise = ["P_5","P_10","P_15","P_20","P_30","P_100","P_200","P_500","P_1000"];
+precise = ["P_5","P_10","P_20","P_100","P_500","P_1000"];
 draw(precise);
 }
 

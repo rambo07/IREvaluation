@@ -77,7 +77,11 @@ router.get('/details', function(req, res) {
 
 /* GET graph page*/
 router.get('/graph', function(req, res) {
-	res.render('graph', { title: 'View Results as Graph'});
+	res.render('graph', { title: 'View Results as Chart'});
+});
+
+router.get('/display', function(req, res) {
+	res.render('display', { title: 'View Multiple Results as Chart'});
 });
 
 /*TEMP GET functionjson pagerouter.get('/functionjson', function(req, res) {
@@ -87,8 +91,9 @@ router.get('/graph', function(req, res) {
 /* POST to graph page*/
 router.post('/records',function(req, res) {
 	req.session.currentrecord = req.body.run;
-	res.location("graph");
-	res.redirect("graph");
+	//res.location("graph");
+	//res.redirect("graph");
+	res.render('graph', { title: req.body.run});
 });
 
 /* POST to accountmanager (new user)*/

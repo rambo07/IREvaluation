@@ -7,23 +7,23 @@ block content
   script(type='text/javascript').
     populateTable()
 
-  h1= title
+  // Wrapper
+  #tablewrapper
 
-    // Wrapper
-    #wrapper
+      // RUN LIST
+      h2 Previous Records
+      #runList
+          table
+              thead
+                  th Date
+                  th Task
+                  th Run
+                  th Display Results
+                  th Comments
+              tbody
+      // /RUN LIST
 
-        // RUN LIST
-        h2 Previous Records
-        #runList
-            table
-                thead
-                    th Date
-                    th Task
-                    th Run
-                    th Display Results
-                    th Comments
-                tbody
-        // /RUN LIST
-
-    // /WRAPPER
-
+  #link
+      br
+      button(type=button) 
+        a#buttonlink(href= '/display') Display Multiple
