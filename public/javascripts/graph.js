@@ -1,31 +1,39 @@
+var testing;
+
 //search for the appropriate data?
-function getRecord(runname, taskname) {
+/*function getRecord() {
   $.getJSON('/records/runlist',function(jsonarray) {
     $.each(jsonarray, function(){
-      if (this.run == runname && this.task == taskname) {
-        console.log("Found you!");
-        return this;
+      if (this.run == document.title) {
+        console.log(this);
+        testing = this;
       }
     });
   });
-}
+}*/
 
 //loading json file
 d3.json('/records/runlist',function(jsonarray){
   var test = d3.entries(jsonarray);
+  var testing;
+  $.each(jsonarray, function(){
+      if (this.run == document.title) {
+        console.log(this);
+        testing = this;
+      }
+  });
 
-  getRecord('results11', 'Taskname');
   //Two Arrays one for values and other for measures
   var measurename = [];
   var measurevalue = [];
         var check = ["map","gm_map","Rprec","bpref","recip_rank","P_5","P_1000"]
-  console.log(test[2].value.results[0].measure)
-  for (var i in test[2].value.results)
+  console.log(testing.results[0].measure)
+  for (var i in testing.results)
   {
-          if(check.indexOf(test[2].value.results[i].measure)!=-1)
+          if(check.indexOf(testing.results[i].measure)!=-1)
     {
-      measurename.push(test[2].value.results[i].measure);
-      measurevalue.push(test[2].value.results[i].value);
+      measurename.push(testing.results[i].measure);
+      measurevalue.push(testing.results[i].value);
     }
   }
 //console.log(measurename);

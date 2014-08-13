@@ -4,12 +4,13 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
-    include functionjson.html
+    include combination.html
     
   body
 
     #header
           p &nbspIR Evaluation Tool
+
     #footer
           p &nbspNavigate: 
             a(href= '/upload') Upload New
@@ -19,10 +20,6 @@ html
             a(href= '/logout') Sign Out
             | 
             a(href= '/about') About
-
-    //form#formAddRun(name="addrun",method="post",action="/graph")
-    //      input#inputRunName(type="text",name="newrun",placeholder="Run name")
-    //      button#btnSubmit(type="submit") Add Run
 
     block content
         script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")

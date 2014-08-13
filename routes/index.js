@@ -38,7 +38,8 @@ router.get('/signup', function(req, res) {
 	if (req.session.user == null) {
 		res.render('signup', { title: 'Create an Account'});
 	} else {
-		res.redirect('record');
+		res.location('records');
+		res.redirect('records');
 	}
 	
 });
@@ -77,7 +78,11 @@ router.get('/details', function(req, res) {
 
 /* GET graph page*/
 router.get('/graph', function(req, res) {
-	res.render('graph', { title: 'View Results as Graph'});
+	res.render('graph', { title: 'View Results as Chart'});
+});
+
+router.get('/display', function(req, res) {
+	res.render('display', { title: 'View Multiple Results as Chart'});
 });
 
 /*TEMP GET functionjson pagerouter.get('/functionjson', function(req, res) {
@@ -87,8 +92,9 @@ router.get('/graph', function(req, res) {
 /* POST to graph page*/
 router.post('/records',function(req, res) {
 	req.session.currentrecord = req.body.run;
-	res.location("graph");
-	res.redirect("graph");
+	//res.location("graph");
+	//res.redirect("graph");
+	res.render('graph', { title: req.body.run});
 });
 
 /* POST to accountmanager (new user)*/
@@ -98,8 +104,8 @@ router.post('/adduser', function(req, res) {
 			console.log(err);
 			res.send("An error occurred while creating your account. Please try again.");
 		} else {
-			res.location("upload");
-			res.redirect("upload");	
+			res.location("records");
+			res.redirect("records");	
 		}
 	});
 });
@@ -109,12 +115,10 @@ router.post('/login', function(req, res) {
 	AM.accountManage("login", req.body.username, req.body.password, function(err, output) {
 		if (!output) {
 			console.log(err); //temp: print more informatively to page?
-			//res.location("login");
-			//res.redirect("login");
 			res.send("Your username or password was incorrect. Please try again"); //temp: should get to display on login page?
 		} else {
 			req.session.user = output;
-			res.location("records"); //redirect to see if added to users (TEMP)
+			res.location("records"); 
 			res.redirect("records");
 		}
 	});

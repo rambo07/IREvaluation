@@ -2,5 +2,8 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
-  p This project intends to provide ease of comparison of different IR runs by displaying TREC_eval data in a visualisation tool. (TBA)
+  p Performing IR evaluation is a difficult task. When multiple systems output are to be compared, a single metric does not convey complete information about the ranked results and the performance of the system. In addition, having many different metrics for comparison make analysis more complex. If there is a single system performing well across all metrics the solution is obvious, but more often the situation is otherwise.
+  p Comparing the incremental growth of an individual system is complex. When comparing against our own previous results, the results vary by ranking, retrieval model and other query formulation techniques. Accounting for all of these at once is quite tricky. It is hard to determine the statistical significance of a given change in one particualar evaluation measure.
+  p Our tool presents a visual representation of different ranked list outputs for an IR task. Instead of the usual TREC_eval matrix of numbers (which is complex to read and interpret) we have a graphical representation of how the results vary across different runs, while changing/selecting different parameters such as the evaluation metric, or between averaged- or query-based representation.
+  p 
+    a(href='/') Back

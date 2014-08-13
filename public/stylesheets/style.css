@@ -3,17 +3,68 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+p {
+	width: 50%;
+}
+
 a {
   color: #00B7FF;
 }
 
+a:visited {
+	color: #006BF7;
+}
+
+a:hover {
+	color: #006B70;
+	text-decoration: none;
+}
+
+a#buttonlink {
+	color: #000000;
+	text-decoration: none;
+}
+
 table {
-	border: 1px dashed grey;
 	width: 100%;
-	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+	font: 16px "Lucida Grande", Helvetica, Arial, sans-serif;
 	text-align: center;
 }
 
+th {
+	background-color: #9999CC;
+	height: 40px;
+	color: #280785;
+}
+
+tr:nth-child(odd) {
+	background-color: #DCDCED;
+}
+
+tr:nth-child(even) {
+	background-color: #F0F0F7;
+}
+
 h1 {
-	font-size: 16px;
+	font-size: 24px;
+}
+
+h2 {
+	font-size: 20px;
+}
+
+#footer {
+	width: 100%;
+	background-color: #DCDCED;
+	position: fixed;
+	bottom: 0;
+	z-index: 9999;
+}
+
+#header {
+	width: 100%;
+	background-color: #DCDCED;
+	position: fixed;
+	top: 0;
+	z-index: 9999;
 }
