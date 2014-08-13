@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <style>
 .bar:hover {
-  fill: #4CB4E0;
+  fill: brown;
 }
 
 .axis path,
@@ -21,7 +21,7 @@
 form {
   position: absolute;
   right: 10px;
-  top: 45px;
+  top: 10px;
 }
 
 </style>
@@ -42,24 +42,15 @@ if(document.getElementById("all").checked)
 function draw(check){
 d3.json('records/runlist',function(json){
 	var test = d3.entries(json);
-  var testing;
-  $.each(json, function(){
-      if (this.run == document.title) {
-        console.log(this);
-        testing = this;
-      }
-  });
 	var measurename = [];
 	var measurevalue = [];
-  console.log(testing.run);
-  //console.log(test[5].value.run);
-	//console.log(test[2].value.results[0].measure);
-	for (var i in testing.results)
+	console.log(test[2].value.results[0].measure);
+	for (var i in test[2].value.results)
 	{
-	        if(check.indexOf(testing.results[i].measure)!=-1)
+	        if(check.indexOf(test[2].value.results[i].measure)!=-1)
 		{
-			measurename.push(testing.results[i].measure);
-			measurevalue.push(testing.results[i].value);
+			measurename.push(test[2].value.results[i].measure);
+			measurevalue.push(test[2].value.results[i].value);
 		}
 	}
 console.log(measurename);

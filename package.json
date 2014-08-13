@@ -17,7 +17,6 @@
     "mongoskin": "*",
     "express-session": "*",
     "connect-busboy": "*",
-    "d3" : "3",
-    "byline" : "*"
+    "d3" : "3"
   }
 }
