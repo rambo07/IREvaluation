@@ -4,6 +4,8 @@ var session = require('express-session');
 var AM = require('./managers/accountmanager');
 var UM = require('./managers/uploadmanager');
 var fs = require('fs');
+var busboy = require('connect-busboy');
+var d3 = require('d3');
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -63,9 +65,30 @@ router.get('/upload', function(req, res) {
 	
 });
 
-/**/
+/* GET about page*/
 router.get('/about', function(req, res) {
-	res.render('about', { title: 'Information Retrieval Evaluation Tool'})
+	res.render('about', { title: 'Information Retrieval Evaluation Tool'});
+});
+
+/* GET details form page*/
+router.get('/details', function(req, res) {
+	res.render('details', { title: 'Add Details'});
+});
+
+/* GET graph page*/
+router.get('/graph', function(req, res) {
+	res.render('graph', { title: 'View Results as Graph'});
+});
+
+/*TEMP GET functionjson pagerouter.get('/functionjson', function(req, res) {
+	res.render('functionjson', {title: 'Display Results'});
+});*/
+
+/* POST to graph page*/
+router.post('/records',function(req, res) {
+	req.session.currentrecord = req.body.run;
+	res.location("graph");
+	res.redirect("graph");
 });
 
 /* POST to accountmanager (new user)*/
@@ -102,29 +125,33 @@ router.post('/logout', function(req, res) {
 	res.redirect('/');
 })
 
-/* POST to uploadmanager (new upload) ?? deal with downloading file from user??*/ 
-//DOES NOT WORK AT PRESENT
+/* POST to uploadmanager */
 router.post('/upload', function(req, res) {
-	console.log("task: "+req.body.runname); //temp
-	pathname = __dirname + "/uploads/"+req.body.runname;
-
-	fs.writeFile(pathname, req.body.file, function(err) {
-		if (err) {
-			res.send("Something has gone wrong.");
-		} else {
-			UM.uploadManage("upload", req.session.user.name, pathname, req.body.taskname, function(err, output) {
-		        if (err) {
-			        console.log(err);
-			        res.send("An error occurred while uploading your file. Please try again.");
-		        } else {
-			        res.location("records");
-			        res.redirect("records");
-		        }
-	        });
-		}
-
+	var fstream;
+	req.pipe(req.busboy);
+	req.busboy.on('file', function(fieldname, file, filename) {
+		req.session.user.currentfile = filename
+		console.log("Uploading: "+filename);
+		fstream = fs.createWriteStream('./uploads/'+filename);
+		file.pipe(fstream);
+		fstream.on('close', function () {
+	        res.location('details');
+            res.redirect('details');
+        });
 	});
-	
+});
+
+router.post('/details', function(req, res) {
+	//operation, username, file, task, run, any comments, callback
+	UM.uploadManage('upload', req.session.user.name, './uploads/'+req.session.user.currentfile, req.body.taskname, req.body.runname, req.body.comments, function(err, output) {
+		if (err) {
+			console.log(err);
+			res.send("An error occurred while uploading your file. Please try again.");
+	    } else {
+	    	res.location('records');
+	    	res.redirect('records');
+	    }
+	});
 });
 
 //accessible to other fns:

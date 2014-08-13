@@ -57,7 +57,7 @@ function modifyRun(collection, name, file, task, runname, callback) {
 	});
 } 
 
-function newRun(collection, name, taskname, runname, file, callback) {
+function newRun(collection, name, taskname, runname, file, comments, callback) {
 
 	var date = new Date(); //for my records: may be useful to show user
 
@@ -71,6 +71,7 @@ function newRun(collection, name, taskname, runname, file, callback) {
 				task: taskname,
 				date: date,
 				run: runname,
+				comments: comments,
 				results: [] //array to contain results from file
 			}
 			stream.on('data', function(line) {
@@ -146,7 +147,7 @@ function printRun(upload) { //TEMPORARY
 }
 
 //"main"
-exports.uploadManage = function(operation, name, file, task, runname, callback) {
+exports.uploadManage = function(operation, name, file, task, runname, comments, callback) {
 	getConnection(function(err, collection) {
 		if (err) {
 			return callback(err)
@@ -163,7 +164,7 @@ exports.uploadManage = function(operation, name, file, task, runname, callback) 
 			if (err) return callback(err)
 			printRun(upload); 
 			collection.db.close();
-			callback();
+			callback(err);
 		}
 
 		function processRequests(err, uploads) { //passes files to data handler/client
@@ -204,12 +205,12 @@ exports.uploadManage = function(operation, name, file, task, runname, callback) 
 
 		//operate based on input:
 		if (operation === "upload") {
-			newRun(collection, name, task, runname, file, processUpload);
+			newRun(collection, name, task, runname, file, comments, processUpload);
 		} else if (operation === "delete") {
 			deleteRun(collection, name, task, runname, processDeletion);
 		} else if (operation === "deleteall") {
 			deleteRuns(collection, name, task, processDeletion);
-		} else if (operation === "get") { //to display a single run
+		} else if (operation === "get") { //to display a single run //UNUSED
 			readRun(collection, name, task, runname, processRequest);
 		/*} else if (operation === "getmultiple") { //(TBA)
 			readMany(collection, name, task, runname, processRequests) //TODO: accept multiple 'runname' values?*/

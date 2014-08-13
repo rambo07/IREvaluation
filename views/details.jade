@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1= title
+  p Please provide the names of the task, run and any comments you would like to add for this file.
+  form#formFileDetails(name="details",method="post",action="/details")
+        input#inputTaskname(type="text", placeholder="taskname", name="taskname")
+        input#inputRunname(type="text", placeholder="runname", name="runname")
+        input#inputComments(type="text", placeholder="comments", name="comments")
+        button#btnSubmit(type="submit") submit
