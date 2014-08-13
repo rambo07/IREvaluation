@@ -42,3 +42,6 @@ function populateTable() {
     });
 }
 
+function test() {
+    alert("testing!");
+}
