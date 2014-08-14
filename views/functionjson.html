@@ -32,6 +32,7 @@ form {
     <label><input type="radio" name="mode" value="groupIPrecision" id="iprecision"> IPrecision</label>
 </form>
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script>
 
 if(document.getElementById("all").checked) 
@@ -43,7 +44,7 @@ function draw(check){
 d3.json('records/runlist',function(json){
 	var test = d3.entries(json);
   var testing;
-  $.each(json, function(){
+  $.each(json, function(){ //selects the correct json based on the title of the page (drawn from the line of table the link was followed from)
       if (this.run == document.title) {
         console.log(this);
         testing = this;
@@ -51,9 +52,8 @@ d3.json('records/runlist',function(json){
   });
 	var measurename = [];
 	var measurevalue = [];
-  console.log(testing.run);
-  //console.log(test[5].value.run);
-	//console.log(test[2].value.results[0].measure);
+  console.log(testing.run); //temp
+
 	for (var i in testing.results)
 	{
 	        if(check.indexOf(testing.results[i].measure)!=-1)
@@ -167,5 +167,19 @@ d3.select("svg").remove();
 precise = ["iprec_at_recall_0.00","iprec_at_recall_0.10","iprec_at_recall_0.50","iprec_at_recall_1.00"]
 draw(precise);
 }
+
+/* SECTION: get list of run names to populate drop-down menu */
+var selectContent = '';
+
+$.getJSON('/records/runlist', function(data) {
+  selectContent +='<option value="default"> Add a run to view</option>';
+  $.each(data, function() {
+    selectContent += '<option value="'+this.run+'">'+this.run+'</option>';
+  });
+  selectContent += '</select>';
+  $('#chooseRun').html(selectContent);
+});
+
+//d3.select('selectButton').on('submit', console.log('testing')); //something like this instead of sending the form?
 
 </script>

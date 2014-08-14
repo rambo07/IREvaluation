@@ -28,7 +28,7 @@ function getConnection(callback) { //localhostetc temporary
 });
 }
 
-//to add things to an uploaded document?
+//to add things to an uploaded document. CURRENTLY UNUSED
 //TODO: change to add extra 'comments' files/strings?
 function modifyRun(collection, name, file, task, runname, callback) { 
 	var date = new Date();
@@ -57,9 +57,9 @@ function modifyRun(collection, name, file, task, runname, callback) {
 	});
 } 
 
+//creates a new document for a new uploaded run.
 function newRun(collection, name, taskname, runname, file, comments, callback) {
-
-	var date = new Date(); //for my records: may be useful to show user
+	var date = new Date(); 
 
 	collection.find({name: name, task: taskname, run: runname}).toArray(function(err, docs) {
 		if (docs.length === 0) { //i.e. there is no run for that task with that name: go ahead
@@ -94,7 +94,7 @@ function newRun(collection, name, taskname, runname, file, comments, callback) {
 			stream.on('end', function() { //when everything has been read, add document to database and return.
 				collection.insert(documents, {new: true}, callback)
 			})
-		} else {
+		} else { //there is already a run+task with that name.
 			return callback(new Error("There is already a run for that task with that description, please choose a different description."))
 		}
 	})
@@ -109,16 +109,16 @@ function deleteRun(collection, name, task, runname, callback) {
 	collection.findAndRemove({name: name, task: task, run: runname}, {w:1}, callback);
 }
 
-//to fetch a specific upload
+/*/to fetch a specific upload
 function readRun(collection, name, task, runname, callback) {
 	collection.findOne({name: name, task: task, run: runname}, callback);
-}
+}*/
 
 //or fetch everything that user has uploaded (e.g. on startup)
 function readAll(collection, name, callback) {
 	collection.find({name: name}, callback);
 }
-
+/*
 function printDescription(upload) {//temp
 	if (!upload) {
 		console.log("No such record.");
@@ -144,7 +144,7 @@ function printRun(upload) { //TEMPORARY
 		//console.log(upload.results); //temp
 		return upload.results
 	}
-}
+}*/
 
 //"main"
 exports.uploadManage = function(operation, name, file, task, runname, comments, callback) {
@@ -162,22 +162,24 @@ exports.uploadManage = function(operation, name, file, task, runname, comments, 
 
 		function processRequest(err, upload) { //passes file to data handler/client
 			if (err) return callback(err)
-			printRun(upload); 
+			//printRun(upload); 
 			collection.db.close();
-			callback(err);
+			callback(upload, err);
 		}
+
+		/*
 
 		function processRequests(err, uploads) { //passes files to data handler/client
 			if (err) return callback(err);
 			uploads.each(function(err, upload) {
 				if (upload) {
-					printRun(upload);
+					callback(upload, err);
 				} else {
 					collection.db.close();
-					callback();
+					callback(err);
 				}
 			})
-		}
+		}*/
 
 		function processDisplay(err, uploads) {
 			if (err) return callback(err);
@@ -206,7 +208,7 @@ exports.uploadManage = function(operation, name, file, task, runname, comments, 
 		//operate based on input:
 		if (operation === "upload") {
 			newRun(collection, name, task, runname, file, comments, processUpload);
-		} else if (operation === "delete") {
+		} else if (operation === "delete") { //currently unused, should be added
 			deleteRun(collection, name, task, runname, processDeletion);
 		} else if (operation === "deleteall") {
 			deleteRuns(collection, name, task, processDeletion);
@@ -216,28 +218,8 @@ exports.uploadManage = function(operation, name, file, task, runname, comments, 
 			readMany(collection, name, task, runname, processRequests) //TODO: accept multiple 'runname' values?*/
 		} else if (operation === "getall") { //e.g. on sign in, return all metadata
 			readAll(collection, name, processDisplay);
-		} else { //TO ADD: 'qrel' == store a qrel file 'results' = store a results file
+		} else { 
 			return callback(new Error("Operation unknown."));
 		}
 	})
 }
-
-/*/ALL BELOW IS TEMPORARY: take inputs and assign to useful readable variables (will later be done by method calls, or passed request)
-var operation = process.argv[2]; 
-var name = process.argv[3]; //the username of the person uploading
-var task = process.argv[4]; //the task name attached to this run
-var runname = process.argv[5]; //the 'name' attached to the specific run
-var file = process.argv[6]; //eventually will be qrels/results, to be stored as files in binary, run through TREC_EVAL, producing the results
-							//which are stored and sent to client?
-
-
-//will eventually be the file passed from the client
-
-//run main with inputs:
-uploadManage(operation, name, file, task, runname, function(err) {
-  if (err) {
-    console.log("An error occurred:", err);
-    process.exit(1);
-  }
-});*/
-//TODO: accept (input file), create document(s)

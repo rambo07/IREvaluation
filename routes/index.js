@@ -12,18 +12,19 @@ router.get('/', function(req, res) {
   res.render('index', { title: 'IR Evaluation Tool' });
 });
 
-/* GET login page. might later have login on index page */
+/* GET login page. Might later prefer to have login on index page */
 router.get('/login', function(req, res) {
 	//if already signed in, redirect to records
 	if (req.session.user == null) {
 		res.render('login', { title: 'Login'});
 	} else {
-		//log/alert "you are already logged in" somehow?
+		// should change to log/alert "you are already logged in" somehow?
 		res.redirect('records');
 	}
 	
 });
 
+/* GET logout page. Redirects to homepage if not signed in. */
 router.get('/logout', function(req, res) {
 	if (req.session.user == null) {
 		res.redirect('/');
@@ -50,7 +51,7 @@ router.get('/records', function(req, res) {
 	if (req.session.user == null) {
 		res.render('signup', { title: 'Create an Account'});
 	} else {
-		console.log(req.session.user);
+		//console.log(req.session.user); //temp to check sessions are working
 	    res.render('records', { title: 'View Runs'});
 	}
 });
@@ -81,15 +82,17 @@ router.get('/graph', function(req, res) {
 	res.render('graph', { title: 'View Results as Chart'});
 });
 
+/* GET multiple-display page (for demonstration)*/
 router.get('/display', function(req, res) {
 	res.render('display', { title: 'View Multiple Results as Chart'});
 });
 
-/*TEMP GET functionjson pagerouter.get('/functionjson', function(req, res) {
-	res.render('functionjson', {title: 'Display Results'});
-});*/
+/*TEMP GET selcom page (more advanced multiple display: kept here until finalised) */
+router.get('/selcom', function(req, res) {
+	res.render('selcom', {title: 'Display Results'});
+});
 
-/* POST to graph page*/
+/* POST to graph page (to allow it to know which run to display)*/
 router.post('/records',function(req, res) {
 	req.session.currentrecord = req.body.run;
 	//res.location("graph");
@@ -110,7 +113,7 @@ router.post('/adduser', function(req, res) {
 	});
 });
 
-/* POST to accountmanager (log in) add some kind of session data?*/
+/* POST to accountmanager (log in) */
 router.post('/login', function(req, res) {
 	AM.accountManage("login", req.body.username, req.body.password, function(err, output) {
 		if (!output) {
@@ -124,12 +127,13 @@ router.post('/login', function(req, res) {
 	});
 });
 
+/* POST logout form, return to index with cleared user session data. */
 router.post('/logout', function(req, res) {
 	req.session.user = null;
 	res.redirect('/');
 })
 
-/* POST to uploadmanager */
+/* POST to uploads folder: file upload itself */ //will later be replaced with upload for qrels etc?
 router.post('/upload', function(req, res) {
 	var fstream;
 	req.pipe(req.busboy);
@@ -145,6 +149,7 @@ router.post('/upload', function(req, res) {
 	});
 });
 
+/* POST to uploadmanager: file details and file to parse. */
 router.post('/details', function(req, res) {
 	//operation, username, file, task, run, any comments, callback
 	UM.uploadManage('upload', req.session.user.name, './uploads/'+req.session.user.currentfile, req.body.taskname, req.body.runname, req.body.comments, function(err, output) {
@@ -158,5 +163,5 @@ router.post('/details', function(req, res) {
 	});
 });
 
-//accessible to other fns:
+//to make these accessible to other functions:
 module.exports = router;

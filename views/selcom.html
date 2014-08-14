@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8">
+<style>
+.bar:hover {
+  fill: brown;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+form1 {
+  position: absolute;
+  right: 150px;
+  top: 10px;
+}
+form2 {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+</style>
+
+<form1>
+    <label><input type="radio" name="mode" value="system1" id="run1" checked > Sys-1</label>
+    <label><input type="radio" name="mode" value="system2" id="run2"> Sys-1,2</label> 
+    <label><input type="radio" name="mode" value="system3" id="run3"> Sys-1,2,3</label> 
+    <label><input type="radio" name="mode" value="system4" id="run4"> Sys-1,2,3,4</label> 
+</form1>
+<!--<form2>
+    <label><input type="radio" name="mode" value="groupAll" id="all" checked > All</label>
+    <label><input type="radio" name="mode" value="groupPrecision" id="precision"> Precision</label> 
+    <label><input type="radio" name="mode" value="groupIPrecision" id="iprecision"> IPrecision</label> 
+</form2>-->
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+if(document.getElementById("run1").checked) 
+{
+	check = ["map","gm_map","Rprec","bpref","recip_rank","P_5"];
+	draw(check,1);
+}
+function compare(a,b)
+{
+    console	
+    if (a.measure < b.measure)
+	return -1;
+    if (a.measure > b.measure)
+    	return 1;
+    return 0;
+}
+function draw(check,runs){
+d3.json("records/runlist",function(json){
+	var test = d3.entries(json);
+	var measurecomb = [];
+	for (var j =0; j<runs;j++)
+	{
+		for (var i in test[j].value.results)
+		{
+		        if(check.indexOf(test[j].value.results[i].measure)!=-1)
+			{
+				var item= {};
+				item.measure = test[j].value.results[i].measure+"_sys"+j;
+				item.value =  test[j].value.results[i].value;	
+				measurecomb.push(item);
+			}
+		}
+	}
+
+measurecomb.sort(compare);
+console.log(measurecomb);
+
+var w = 1200;
+var h = 350;
+var barPadding = 5;
+var padding = 20;
+
+var yscale = d3.scale.linear()
+                     .domain([0, d3.max(measurecomb, function(d,i) {return d.value })])
+		     .range([h-padding,padding]);
+
+var xscale = d3.scale.ordinal()
+    .range([0,w]);
+
+
+//Create SVG element
+var svg = d3.select("body")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
+
+svg.selectAll(".bar")
+   .data(measurecomb)
+   .enter()
+   .append("rect")
+   .attr("class","bar")
+   .attr("x",function(d,i){
+	return ((padding*2)+i*((w-padding*2)/measurecomb.length));})
+       .attr("y", function(d,i){
+	return (yscale(d.value));})
+   .attr("width", w/measurecomb.length - barPadding*5)
+   .attr("height", function(d) {return h-yscale(d.value) -padding;})
+   .attr("fill",function(d){
+	var barcolor;
+	for (z=0;z<runs;z++)
+	{
+		if(d.measure.indexOf("sys"+z)!=-1){
+			console.log(z,z*40);
+			barcolor = "rgb("+50+","+50+","+(z*50)+")";
+			break}
+	}
+	return barcolor; });
+
+svg.selectAll("text")
+   .data(measurecomb)
+   .enter()
+   .append("text")
+        
+   .text(function(d) {
+        return d.measure;
+   }) 
+  .attr("text-anchor", "middle")
+  .attr("x", function(d, i) {
+        return padding*2+ i*((w -padding*2)/ measurecomb.length) +((w -padding*2)/ measurecomb.length - barPadding*5)/2;
+   })
+   .attr("y", function(d) {
+        return h-barPadding ;
+   })
+   .attr("font-family", "sans-serif")
+   .attr("font-size", "12px")
+   .attr("fill", "black");
+
+var yAxis = d3.svg.axis()
+        .scale(yscale)
+        .orient("left")
+	.ticks(10)
+svg.append("g")
+    .attr("class","axis")
+    .attr("transform", "translate(30,0)")
+    .call(yAxis);
+
+var xAxis = d3.svg.axis()
+        .scale(xscale)
+        .orient("bottom")
+svg.append("g")
+    .attr("class","axis")
+    .attr("transform", "translate(20,330)")
+    .call(xAxis);
+
+d3.selectAll("input").on("change", change);
+
+function change() {
+  if (this.value === "system1") transitionRun1();
+  else if(this.value == "system2") transitionRun2();
+  else if(this.value == "system3") transitionRun3();
+  else if(this.value == "system4") transitionRun4();
+}
+});
+}
+
+//Functions for changing display/SVG's
+
+function transitionRun1() {
+d3.select("svg").remove();
+check = ["map","gm_map","Rprec","bpref","P_5"];
+draw(check,1);
+}
+
+function transitionRun2() {
+d3.select("svg").remove();
+check = ["map","gm_map","Rprec","bpref","P_5"];
+draw(check,2);
+}
+
+function transitionRun3() {
+d3.select("svg").remove();
+check = ["map","gm_map","Rprec","bpref","P_5"];
+draw(check,3);
+}
+
+function transitionRun4() {
+d3.select("svg").remove();
+check = ["map","gm_map","Rprec","bpref","P_5"];
+draw(check,4);
+}
+
+</script>

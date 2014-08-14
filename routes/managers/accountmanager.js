@@ -87,7 +87,7 @@ exports.accountManage = function(operation, name, password, callback) {
 		//handles create/update requests
 		function processUser(err, user) {
 			if (err) return callback(err);
-			printUser(user); //temp
+			printUser(user); //temporary: for debug purposes
 			collection.db.close();
 			callback();
 		}
@@ -95,8 +95,7 @@ exports.accountManage = function(operation, name, password, callback) {
 		//handles signin requests
 		function processSignin(err, user) {
 			if (err) return callback(err);
-			//will later pass request to uploadmanager to get data for list of previous uploads
-			signinUser(user); //temp
+			signinUser(user); //temporary: for debug purposes
 			collection.db.close();
 			callback(err, user);
 		}
@@ -123,6 +122,7 @@ exports.accountManage = function(operation, name, password, callback) {
 				}
 			});
 		}
+
 		// performs correct operation given input
 		if (operation === "list") {
 			readAll(collection, processUsers);

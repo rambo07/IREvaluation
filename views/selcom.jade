@@ -4,12 +4,12 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
-    include functionjson.html
+    include selcom.html
     
   body
 
-    #header
-          p &nbspIR Evaluation Tool
+    //#header
+    //      p &nbspIR Evaluation Tool
     #footer
           p &nbspNavigate: 
             a(href= '/upload') Upload New
@@ -20,12 +20,6 @@ html
             | 
             a(href= '/about') About
 
-    //form for adding graphs?
-    form#formAddRun(name="addrun",method="post",action="")
-          select#chooseRun
-          button#selectButton select
-
     block content
         script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")
         script(src="http://d3js.org/d3.v3.min.js")
-        //script(src="/javascripts/graph.js")
