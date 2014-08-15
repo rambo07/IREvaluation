@@ -1,5 +1,5 @@
 doctype html
-//extends layout
+//doesn't extend layout because some of the page elements needed to be changed to not interfere with each other
 html
   head
     title= title
@@ -20,9 +20,10 @@ html
             | 
             a(href= '/about') About
 
-    //form#formAddRun(name="addrun",method="post",action="/graph")
-    //      input#inputRunName(type="text",name="newrun",placeholder="Run name")
-    //      button#btnSubmit(type="submit") Add Run
+    //form for adding graphs --DOES NOT WORK YET: IS A PLACEHOLDER--
+    form#formAddRun(name="addrun",method="post",action="")
+          select#chooseRun
+          button#selectButton select
 
     block content
         script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")

@@ -1,16 +1,15 @@
 doctype html
-//does not extend layout because it was interfering with the page somehow: hence header and footer are in the body.
+//extends layout
 html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
-    include combination.html
+    include selcom.html
     
   body
 
-    #header
-          p &nbspIR Evaluation Tool
-
+    //#header
+    //      p &nbspIR Evaluation Tool
     #footer
           p &nbspNavigate: 
             a(href= '/upload') Upload New
@@ -24,4 +23,3 @@ html
     block content
         script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")
         script(src="http://d3js.org/d3.v3.min.js")
-        //script(src="/javascripts/graph.js")

@@ -20,6 +20,7 @@ a:hover {
 	text-decoration: none;
 }
 
+/* For links on buttons (as on the temporary Display Multiple button on /records) */
 a#buttonlink {
 	color: #000000;
 	text-decoration: none;
@@ -67,4 +68,10 @@ h2 {
 	position: fixed;
 	top: 0;
 	z-index: 9999;
+}
+
+/* To force it not to overlap with the header. If you have time: try and alter this css to position controls relatively instead of like this.*/
+#formAddRun {
+	position: fixed;
+	top: 70px;
 }
