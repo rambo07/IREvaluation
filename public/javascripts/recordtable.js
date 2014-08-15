@@ -1,15 +1,6 @@
 // Userlist data array for filling in info box
 var runListData = [];
 
-/*/ DOM Ready =============================================================//not working?
-$(document).ready(function() {
-
-    // Populate the user table on initial page load
-    populateTable();
-
-
-});*/
-
 // Functions =============================================================
 
 // Fill table with data

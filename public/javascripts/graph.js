@@ -1,23 +1,11 @@
-var testing;
-
-//search for the appropriate data?
-/*function getRecord() {
-  $.getJSON('/records/runlist',function(jsonarray) {
-    $.each(jsonarray, function(){
-      if (this.run == document.title) {
-        console.log(this);
-        testing = this;
-      }
-    });
-  });
-}*/
+//roughly the same code as in functionjson.html. was originally for testing that the run-selection worked. 
 
 //loading json file
 d3.json('/records/runlist',function(jsonarray){
   var test = d3.entries(jsonarray);
-  var testing;
+  var testing; //variable to hold desired run
   $.each(jsonarray, function(){
-      if (this.run == document.title) {
+      if (this.run == document.title) { //find out which run was selected from the title of the page (as set when clicked from /records)
         console.log(this);
         testing = this;
       }

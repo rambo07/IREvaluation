@@ -1,3 +1,4 @@
+//index.js: provides routes for each page.
 var express = require('express');
 var router = express.Router();
 var session = require('express-session');
@@ -107,8 +108,9 @@ router.post('/adduser', function(req, res) {
 			console.log(err);
 			res.send("An error occurred while creating your account. Please try again.");
 		} else {
-			res.location("records");
-			res.redirect("records");	
+			//req.session.user = output; //need to change "create" to return the new account details: this doesn't work yet.
+			res.location("login");
+			res.redirect("login");	
 		}
 	});
 });
@@ -118,7 +120,7 @@ router.post('/login', function(req, res) {
 	AM.accountManage("login", req.body.username, req.body.password, function(err, output) {
 		if (!output) {
 			console.log(err); //temp: print more informatively to page?
-			res.send("Your username or password was incorrect. Please try again"); //temp: should get to display on login page?
+			res.send("Your username or password was incorrect. Please try again"); //Change this to display this text on the login page itself
 		} else {
 			req.session.user = output;
 			res.location("records"); 
@@ -151,7 +153,7 @@ router.post('/upload', function(req, res) {
 
 /* POST to uploadmanager: file details and file to parse. */
 router.post('/details', function(req, res) {
-	//operation, username, file, task, run, any comments, callback
+	//uploadManage takes input of the form: operation, username, file, task, run, any comments, callback
 	UM.uploadManage('upload', req.session.user.name, './uploads/'+req.session.user.currentfile, req.body.taskname, req.body.runname, req.body.comments, function(err, output) {
 		if (err) {
 			console.log(err);

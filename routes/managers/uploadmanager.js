@@ -3,7 +3,7 @@
 
 // TODO: add 'add queries' for a new set of results for a given run, modify return values of 'gets' to be more appropriate
 
-// Retrieve
+// Retrieve various
 var MongoClient = require('mongodb').MongoClient;
 var fs = require('fs');
 var byline = require('byline');
@@ -13,7 +13,7 @@ var byline = require('byline');
 function getConnection(callback) { //localhostetc temporary
 	MongoClient.connect("mongodb://localhost:27017/database", function(err, db) {
   if(err) {
-    return callback(err)
+    return callback(err);
   }
   //create new collection if it's not there
   var collection = db.collection('uploads');
@@ -21,7 +21,7 @@ function getConnection(callback) { //localhostetc temporary
   //index  by name, for speed 
   collection.ensureIndex({name: true}, function (err) {
   	if (err) {
-  		return callback(err)
+  		return callback(err);
   	}
   	callback(null, collection);
   });
@@ -75,11 +75,10 @@ function newRun(collection, name, taskname, runname, file, comments, callback) {
 				results: [] //array to contain results from file
 			}
 			stream.on('data', function(line) {
-				var words = line.split("\t") //split by tabs: works for now, may not on final product
-				var measure = words[0].trim() //remove excess whitespace
-				var query = words[1]
-				var value = words[2]
-				//console.log('\{ '+measure+': '+value+', query: '+query+' \}'); //temp print for checks
+				var words = line.split("\t"); //split by tabs: works for now, may not on final product
+				var measure = words[0].trim(); //remove excess whitespace
+				var query = words[1];
+				var value = words[2];
 				var document = { //create object for each line
 					measure: measure,
 					query: query,
@@ -87,15 +86,15 @@ function newRun(collection, name, taskname, runname, file, comments, callback) {
 				}
 
 				documents.results.push(document) //add object to 'results'
-			})
+			});
 			stream.on('error', function(err) { //an error occurs in filereading
-				return callback(new Error("An error occurred"))
-			})
+				return callback(new Error("An error occurred"));
+			});
 			stream.on('end', function() { //when everything has been read, add document to database and return.
-				collection.insert(documents, {new: true}, callback)
-			})
+				collection.insert(documents, {new: true}, callback);
+			});
 		} else { //there is already a run+task with that name.
-			return callback(new Error("There is already a run for that task with that description, please choose a different description."))
+			return callback(new Error("There is already a run for that task with that description, please choose a different description."));
 		}
 	})
 }
@@ -110,7 +109,7 @@ function deleteRun(collection, name, task, runname, callback) {
 }
 
 /*/to fetch a specific upload
-function readRun(collection, name, task, runname, callback) {
+function readRun(collection, name, task, runname, callback) { //UNUSED: should be modified to suit getting multiple named runs.
 	collection.findOne({name: name, task: task, run: runname}, callback);
 }*/
 
@@ -118,35 +117,8 @@ function readRun(collection, name, task, runname, callback) {
 function readAll(collection, name, callback) {
 	collection.find({name: name}, callback);
 }
-/*
-function printDescription(upload) {//temp
-	if (!upload) {
-		console.log("No such record.");
-	} else {
-		//console.log(upload.name +", " + upload.task +", "+upload.run+", "+upload.date);
-		var date = upload.date.toString();
-		var trimdate = date.slice(0, 15); //need to confirm that all dates will be exactly this long
-		var desc = {
-			"task": upload.task,
-			"run": upload.run,
-			"date": trimdate
-		}
-		console.log(desc); //temp
-		//return desc; 
-	}
-}
 
-//TODO: will actually pass the correct file for the graph
-function printRun(upload) { //TEMPORARY
-	if (!upload) {
-		console.log("Could not find specified record");
-	} else {
-		//console.log(upload.results); //temp
-		return upload.results
-	}
-}*/
-
-//"main"
+//the "main" function
 exports.uploadManage = function(operation, name, file, task, runname, comments, callback) {
 	getConnection(function(err, collection) {
 		if (err) {
@@ -155,7 +127,7 @@ exports.uploadManage = function(operation, name, file, task, runname, comments, 
 
 		function processUpload(err, upload) { //handles added files
 			if (err) return callback(err)
-			console.log("uploaded."); //temp
+			console.log("uploaded."); //temp: for acknowledgement
 			collection.db.close();
 			callback();
 		}
@@ -168,17 +140,10 @@ exports.uploadManage = function(operation, name, file, task, runname, comments, 
 		}
 
 		/*
-
-		function processRequests(err, uploads) { //passes files to data handler/client
+		function processRequests(err, uploads) { //UNUSED
 			if (err) return callback(err);
-			uploads.each(function(err, upload) {
-				if (upload) {
-					callback(upload, err);
-				} else {
-					collection.db.close();
-					callback(err);
-				}
-			})
+			collection.db.close();
+			callback(uploads, err); //temp, may require other processing
 		}*/
 
 		function processDisplay(err, uploads) {
@@ -187,37 +152,27 @@ exports.uploadManage = function(operation, name, file, task, runname, comments, 
 				if (err) return callback(err);
 				else callback(err, docs);
 			});
-
-			/*
-			uploads.each(function(err, upload) {
-				if (upload) {
-					printDescription(upload); //temp
-				} else {
-					collection.db.close();
-					callback(uploads);
-				}
-			})*/
 		}
 
-		function processDeletion(err, upload) {
+		function processDeletion(err, upload) { //UNUSED
 			if (err) return callback(err);
 			collection.db.close();
 			callback();
 		}
 
-		//operate based on input:
+		//operate on input:
 		if (operation === "upload") {
-			newRun(collection, name, task, runname, file, comments, processUpload);
-		} else if (operation === "delete") { //currently unused, should be added
-			deleteRun(collection, name, task, runname, processDeletion);
+			newRun(collection, name, task, runname, file, comments, processUpload); //uploads a file
+		} else if (operation === "delete") { 
+			deleteRun(collection, name, task, runname, processDeletion); //"delete" is currently unused, should be added later
 		} else if (operation === "deleteall") {
-			deleteRuns(collection, name, task, processDeletion);
-		} else if (operation === "get") { //to display a single run //UNUSED
-			readRun(collection, name, task, runname, processRequest);
+			deleteRuns(collection, name, task, processDeletion); //"deleteall" is currenty unused, may be implemented for when deleting a user account?
+		} else if (operation === "get") { 
+			readRun(collection, name, task, runname, processRequest); //"get" is currently unused, should be added to get a single run later
 		/*} else if (operation === "getmultiple") { //(TBA)
-			readMany(collection, name, task, runname, processRequests) //TODO: accept multiple 'runname' values?*/
-		} else if (operation === "getall") { //e.g. on sign in, return all metadata
-			readAll(collection, name, processDisplay);
+			readMany(collection, name, task, runname, processRequests) *///"getmultiple" is currently unused, should be added to get many runs later
+		} else if (operation === "getall") {
+			readAll(collection, name, processDisplay); //gets all runs for that user (to populate 'records/runlist').
 		} else { 
 			return callback(new Error("Operation unknown."));
 		}

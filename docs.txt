@@ -1,0 +1,138 @@
+//Also available in .docx form in the google drive folder: https://docs.google.com/document/d/1qX09E4yPhyfpTRWjp9udvmlN6sVAjWbqZ1Zhgz_WlaI/edit?usp=sharing
+
+IR Evaluation tool:
+Structure:
+
+	app.js: Sets up the database and is an entry point into the routes.
+
+	routes/index.js: Provides routes for each page, accesses the db (for various forms, etc) 
+
+	routes/records.js Provides specific route(s) for table/graph data access to db
+
+	routes/managers/accountmanager.js and
+	routes/managers/uploadmanager.js: Provide interfaces to their respective dbs
+
+	views/*.jade: Generate html for their respective pages
+
+	views/*.html: Are included in their respective jade views, contain d3 code.
+
+	public/: Holds files (images/css) that are required by pages, js to generate tables, etc.
+
+	bin/www: Is an entry point into the app from npm.
+
+	package.json: Lists npm module dependencies, please add as applicable.
+
+	sample2.json (and others): examples of the structure of jsons in the uploads db.
+
+	data/: convenient folder for holding mongodb files.
+
+	sketches/: mockups of the intended final product (of stage 1)
+
+TODO (short-term):
+
+	add validators for each form, (only allow a-z 0-9 for some inputs, etc)
+
+	add security to login system: salt-and-hash, storing data somewhere better than sessions, etc
+
+	possibly either start from scratch or reform the entire project to not use jade/do more client-side?
+
+	add remaining upload/account management options to front-end: modify and delete runs or accounts, perhaps add an ‘email’ option to the account details and a module for password recovery.
+
+	make multiple-run displays dependent on selections and not hard-coded.
+
+	tidy ‘html’ code into: .js file for javascript, .jade file for all non-code-generated html, style.css for css
+
+	
+	Node-modules:
+
+	Express: provides the web app framework.
+	Static-favicon: provides the favicon possibility which can be implemented later.
+	Morgan: is middleware for logging the http requests
+	Cookie- and Body-parser: do what is said on their respective tins - parse cookies etc.
+	Debug: small debugging utility, may or may not be useful to you
+	Jade: generates html from more terse text, could be replaced with ejs probably if that is preferred.
+	Mongodb: node module for accessing mongodb
+	Mongoskin: simplifies some of the code involved in accessing mongodb. Could be removed, but the lines invoking mongo would need to be altered in app.js (and maybe index.js)
+	Express-session: provides the user sessions. May need to be replaced with something more secure. (used in index.js)
+	Connect-busboy: helps with dealing with the multipart forms involved in file uploads. (used in index.js)
+	d3: to allow node use of d3 for creating charts etc. Used in the html files for graph display
+	byline: allows uploadmanager.js to parse files by line.
+
+The purpose/content of the more important files and functions:
+
+Index.js:
+
+Most of the ‘get’s are self-explanatory. They render the pages from the jade files in ‘views’. The ‘posts’ manage various forms for logins, uploads, graph data etc. Comments should make clear which does what. Edit this to add new pages, change redirects, add results from form submission, etc. Look at the express.js API to clarify how to use .get, .post and req/res.
+Records.js:
+
+Returns json array containing all records for the logged-in user when accessing /records/runlist. Works like Index.js except that ‘records/runlist’ is not actually intended to be visited by the user.
+Accountmanager.js:
+
+Main function accessible as (accountManage(operation, name, password, callback)). Internal functions create, delete, modify accounts and connect to the database. See below (uploadmanager) for further details on structure. Comments should make clear the purpose of each component.
+Operations can be: create, delete, update, login, list
+
+Uploadmanager.js:
+
+Main function accessible as (uploadManage(operation, name, file, task, runname, comments, callback)). Unused parameters can be replaced by the empty string. This is clearly not the most effective way of doing this and feel free to update it.
+
+Operations can be: upload, delete, get, getall (and getmultiple, which needs to be implemented)
+
+Internal functions: 
+
+getConnection: connects to the database, uses the collection ‘uploads’, executes the callback.
+
+modifyRun: unused in the current product, should be used when editing already uploaded runs. Currently only updates the date and changes the run file. Should be edited to modify comments, etc.
+
+newRun: used by uploadManage to add the supplied name, taskname, runname, file and comments as a single document to the ‘uploads’ collection. If there is already a run with the same name for the same task, it returns an error.
+
+deleteRun(s): not currently used in the project. Should be hooked up to some ‘remove run’ button on the records view.
+
+Read/PrintRun/Description: commented out because unused. Were initially for appropriately formatting data when using the command line to view files. Unnecessary but could maybe be modified to do something else more useful.
+
+Within uploadManage: functions are to be used as callbacks, to close the db and return data as needed. ProcessRequests is commented as currently unused by any operation.
+
+Views and graph-creating code:
+
+functionjson/combination/selcom.html (to be separated into .js files, jade and additions to the style.css file): 
+create the d3 graphs and controls for them. pull data from /records/runlist. Multiple-run features currently hard-coded instead of individually selected. graph.js contains some of the same code as functionjson and may be used instead if the html/css is moved from functionjson into the relevant jade/css files (graph.jade and style.css).
+
+layout.jade: 
+provides code visible on most pages (not the graph pages just now, as they contain some interfering elements). Header containing the project name, footer containing general navigation to other pages.
+
+Various other pages hold forms for: logins, signups, uploads, etc.
+
+records.jade:
+“display multiple” button only works when there are at least three records in the db, due to how it has been hardcoded. It is only temporary in any case. Appearance can be changed from style.css. 
+
+graph.jade (viewed as /record still)
+Graph page’s add run drop-down is only a placeholder: it does not yet work. Code for generating the graphs is in functionjson.html for now.
+
+Public/javascripts:
+This folder is the location for any javascript files you wish to have accessed from front-end pages. Includes:
+
+recordtable.js: Generates the table on /records from the runlist.
+graph.js: Contains just the javascript for generating e.g. functionjson.html. All html files may be split to generate javascript files for this folder later.
+
+KNOWN BUGS:
+
+The graph display cannot distinguish between two runs with the same name regardless of task. May need to force all run names to be different or change the method by which it selects a given run.
+
+Currently both combination.html and selcom.html are hard-coded wrt picking jsons from an array: this must be updated to correspond to selections from a drop-down menu.
+
+The sign-up page doesn’t redirect properly or log you in: the latter should be alterable by adding a req.session.user == this line somewhere in index.js’s /*POST*/ for that form, the former should be changeable by adding lines to redirect to ‘/upload’ on success.
+
+Suggestions for later stages:
+
+Include/allow the user to add different fields for binary/ternary/etc options like “manual” vs “automatic”, so runs can be selected by this.
+
+Some kind of “group by” function, grouping runs on the recordlist page by task, “run type” (which needs to be implemented as well), method, parameters? Some kind of “merge multiple” for the same “run type” with different parameters? (I did not understand this very clearly so it may be a bad way to do this)
+
+Move the filehandling etc to the client, pass only the parsed data to the db?
+
+Use some kind of ‘virtual browser’ to pre-render d3js and reduce load on client?
+
+
+
+Required for later stages:
+
+Add trec_eval stage, accept instead the ‘results’ and ‘qrels’ files, put these through trec_eval and store results in database. Add further system/query drill-down options on graph display pages. Possibly add some kind of ‘export to png’ option on the graphs.
